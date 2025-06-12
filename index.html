@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Superstore - Dashboard de Rentabilidad</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }        .dashboard-section {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(203, 213, 225, 0.3);
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }        .dashboard-header h2 {
+            font-size: 2.2rem;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .dashboard-header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }        .dashboard-container {
+            position: relative;
+            background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .dashboard-preview {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+        }        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(248, 250, 252, 0.97);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .preview-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 8px;
+            color: #1e293b;
+            font-weight: 500;
+            border: 1px solid rgba(59, 130, 246, 0.12);
+        }
+
+        .feature-item i {
+            color: #3b82f6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }        .btn-powerbi-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.25);
+        }
+
+        .btn-powerbi-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(45deg, #d97706, #b45309);
+        }
+
+        .btn-demo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-demo:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.35);
+            background: linear-gradient(45deg, #1d4ed8, #1e3a8a);
+        }
+
+        .dashboard-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        .mock-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .mock-chart {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }        .chart1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 60%;
+            background: linear-gradient(45deg, #10b981, #059669);
+            border-radius: 4px 4px 0 0;
+        }
+
+        .chart2::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            height: 80%;
+            background: conic-gradient(#3b82f6 0deg 120deg, #f59e0b 120deg 240deg, #ef4444 240deg 360deg);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .chart3::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            height: 70%;
+            background: linear-gradient(90deg, 
+                #3b82f6 0%, #3b82f6 25%, 
+                #10b981 25%, #10b981 50%, 
+                #f59e0b 50%, #f59e0b 75%, 
+                #8b5cf6 75%, #8b5cf6 100%);
+            border-radius: 4px;
+        }
+
+        .chart4::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            border-radius: 8px;
+            opacity: 0.8;
+        }
+
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }        .info-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(203, 213, 225, 0.2);
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        .info-card h3 {
+            color: #1e293b;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card p {
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .icon {
+            color: #3b82f6;
+            font-size: 1.2rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }        .tech-tag {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-size: 1rem;
+        }        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #3b82f6;
+            font-size: 2rem;
+            z-index: 1;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+            }
+            
+            .dashboard-preview {
+                height: 500px;
+            }
+
+            .preview-content {
+                padding: 20px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-powerbi-main, .btn-demo {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .project-info {
+                grid-template-columns: 1fr;
+            }
+        }        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(45deg, #1d4ed8, #1e3a8a);
+        }
+
+        .btn-powerbi {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #f1c232, #e69138);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-powerbi:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(241, 194, 50, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-retry {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .auth-notice {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-chart-line"></i> Análisis Superstore</h1>
+            <p>Dashboard interactivo de análisis de rentabilidad y rendimiento empresarial basado en datos de Superstore</p>
+        </header>
+
+        <section class="dashboard-section">
+            <div class="dashboard-header">
+                <h2>Dashboard de Rentabilidad y Ventas</h2>
+                <p>Explora los insights clave del negocio a través de visualizaciones interactivas</p>
+            </div>            <div class="dashboard-container">
+                <div class="dashboard-preview">
+                    <div class="preview-overlay">
+                        <div class="preview-content">                            <i class="fas fa-chart-line" style="font-size: 4rem; color: #3b82f6; margin-bottom: 20px;"></i>
+                            <h3 style="color: #1e293b; margin-bottom: 15px; font-size: 1.8rem;">Dashboard Interactivo de Power BI</h3>
+                            <p style="color: #64748b; margin-bottom: 25px; font-size: 1.1rem;">
+                                Explora análisis detallados de rentabilidad, ventas por región, tendencias temporales y segmentación de clientes
+                            </p>
+                            <div class="features-grid">
+                                <div class="feature-item">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <span>Análisis de Ventas</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Datos por Región</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Tendencias Temporales</span>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>Segmentación</span>
+                                </div>
+                            </div>
+                            <div class="cta-buttons">
+                                <a href="https://app.powerbi.com/reportEmbed?reportId=a69b85bf-7d38-46ba-afa3-9180402bd62c&autoAuth=true&ctid=430f2559-efe1-453d-b47a-db7388705331&actionBarEnabled=true" 
+                                   target="_blank" 
+                                   class="btn-powerbi-main">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    Ver Dashboard Completo
+                                </a>
+                                <button onclick="showDemoInfo()" class="btn-demo">
+                                    <i class="fas fa-info-circle"></i>
+                                    Información del Proyecto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-background">
+                        <div class="mock-charts">
+                            <div class="mock-chart chart1"></div>
+                            <div class="mock-chart chart2"></div>
+                            <div class="mock-chart chart3"></div>
+                            <div class="mock-chart chart4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-info">
+            <div class="info-card">
+                <h3><i class="fas fa-database icon"></i>Sobre el Proyecto</h3>
+                <p>Este dashboard presenta un análisis completo de los datos de Superstore, enfocándose en métricas clave de rentabilidad, tendencias de ventas y rendimiento por categorías. Los datos han sido procesados y limpiados usando Python y pandas para garantizar la calidad del análisis.</p>
+                <a href="Superstore_limpio.csv" class="btn-download" download>
+                    <i class="fas fa-download"></i>
+                    Descargar Dataset
+                </a>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-tools icon"></i>Tecnologías Utilizadas</h3>
+                <p>El proyecto combina diferentes herramientas de análisis de datos y visualización para crear una solución integral de Business Intelligence.</p>
+                <div class="tech-stack">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">Pandas</span>
+                    <span class="tech-tag">Power BI</span>
+                    <span class="tech-tag">HTML/CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                </div>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-chart-bar icon"></i>Métricas Clave</h3>
+                <p>El dashboard incluye análisis de ventas por región, rentabilidad por producto, tendencias temporales, y segmentación de clientes. Todas las visualizaciones son interactivas y permiten drill-down para análisis detallados.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3><i class="fas fa-lightbulb icon"></i>Insights del Negocio</h3>
+                <p>Identificación de productos más rentables, regiones con mejor performance, patrones estacionales de ventas, y oportunidades de optimización. Los datos revelan tendencias importantes para la toma de decisiones estratégicas.</p>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Diego - Análisis de Datos y Business Intelligence Portfolio</p>
+    </footer>
+
+    <script>        // Función para mostrar información del demo
+        function showDemoInfo() {
+            const projectInfo = document.querySelector('.project-info');
+            projectInfo.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Animación de aparición de las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Aplicar animación a las tarjetas
+        document.querySelectorAll('.info-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Animación para los elementos del dashboard preview
+        document.addEventListener('DOMContentLoaded', () => {
+            const mockCharts = document.querySelectorAll('.mock-chart');
+            mockCharts.forEach((chart, index) => {
+                setTimeout(() => {
+                    chart.style.opacity = '1';
+                    chart.style.transform = 'scale(1)';
+                }, index * 200);
+            });
+        });
+
+        // Inicializar estilos de los mock charts
+        document.querySelectorAll('.mock-chart').forEach(chart => {
+            chart.style.opacity = '0';
+            chart.style.transform = 'scale(0.8)';
+            chart.style.transition = 'all 0.6s ease';
+        });
+    </script>
+</body>
+</html>
